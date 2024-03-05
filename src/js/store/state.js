@@ -1,6 +1,6 @@
 export const store = {
-    camera: null,
-    renderer: null,
-    scene: null,
-    shaderart: true
+  camera: null,
+  renderer: null,
+  scene: null,
+  shaderart: true
 };

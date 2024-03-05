@@ -3,7 +3,6 @@ export class Pointer {
         this._instance = null;
 
         this.onPointerMove = this.onPointerMove.bind(this);
-        console.log('event!');
         // this.onPointerUp = this.onPointerUp.bind(this);
         // this.onPointerDown = this.onPointerDown.bind(this);
 

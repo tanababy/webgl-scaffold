@@ -5,29 +5,34 @@ import fragment from '../shader/fragment.glsl?raw';
 import { baseObject3D } from './baseObject3D.js';
 
 export class FullScreen extends baseObject3D {
-    constructor() {
-        super();
+  constructor() {
+    super();
 
-        this.init();
-    }
+    this.init();
+  }
 
-    async init() {
-        this.material = new THREE.ShaderMaterial({
-            uniforms: {
-                uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-            },
-            vertexShader: vertex,
-            fragmentShader: fragment,
-        });
+  async init() {
+    this.material = new THREE.ShaderMaterial({
+      uniforms: {
+        uResolution: {
+          value: new THREE.Vector2(window.innerWidth, window.innerHeight)
+        },
+        uTime: { value: 0 }
+      },
+      vertexShader: vertex,
+      fragmentShader: fragment
+    });
 
-        this.fsq = new FullScreenQuad(this.material);
-    }
+    this.fsq = new FullScreenQuad(this.material);
+  }
 
-    update() {
-        super.update();
+  update(time) {
+    super.update();
 
-        //https://scrapbox.io/0b5vr/Three.js:_FullScreenQuad
-        //これ使うとrenderいらない
-        this.fsq.render(this.renderer);
-    }
+    this.material.uniforms.uTime.value = time;
+
+    //https://scrapbox.io/0b5vr/Three.js:_FullScreenQuad
+    //これ使うとrenderいらない
+    this.fsq.render(this.renderer);
+  }
 }

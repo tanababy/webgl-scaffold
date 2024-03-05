@@ -17,86 +17,86 @@
  */
 
 export class Damper {
-    constructor(props) {
-        this.values = {};
-        this.targetValues = {};
-        this.deltaValues = {};
+  constructor(props) {
+    this.values = {};
+    this.targetValues = {};
+    this.deltaValues = {};
 
-        Object.assign(this.values, props.values);
-        Object.assign(this.targetValues, props.values);
+    Object.assign(this.values, props.values);
+    Object.assign(this.targetValues, props.values);
 
-        this.epsilon = 0.001;
-        this.hasReached = true;
-        this.dampingFactor = props.dampingFactor;
+    this.epsilon = 0.001;
+    this.hasReached = true;
+    this.dampingFactor = props.dampingFactor;
 
-        for (const key in this.values) {
-            this.deltaValues[key] = 0;
-        }
+    for (const key in this.values) {
+      this.deltaValues[key] = 0;
+    }
+  }
+
+  update() {
+    const deltas = {};
+    let approached = true;
+
+    for (const key in this.values) {
+      deltas[key] = this.targetValues[key] - this.values[key];
+      approached = approached && Math.abs(deltas[key]) < this.epsilon;
     }
 
-    update() {
-        const deltas = {};
-        let approached = true;
+    if (approached) {
+      for (const key in this.values) {
+        this.deltaValues[key] = deltas[key];
+        this.values[key] = this.targetValues[key];
+      }
 
-        for (const key in this.values) {
-            deltas[key] = this.targetValues[key] - this.values[key];
-            approached = approached && Math.abs(deltas[key]) < this.epsilon;
-        }
+      this.hasReached = true;
+    } else {
+      for (const key in this.values) {
+        this.deltaValues[key] = this.dampingFactor * deltas[key];
+        this.values[key] += this.deltaValues[key];
+      }
+    }
+  }
 
-        if (approached) {
-            for (const key in this.values) {
-                this.deltaValues[key] = deltas[key];
-                this.values[key] = this.targetValues[key];
-            }
+  setTarget(target) {
+    for (const key in target) {
+      this.targetValues[key] = target[key];
+    }
+    this.hasReached = false;
+  }
 
-            this.hasReached = true;
-        } else {
-            for (const key in this.values) {
-                this.deltaValues[key] = this.dampingFactor * deltas[key];
-                this.values[key] += this.deltaValues[key];
-            }
-        }
+  addToTarget(key, value) {
+    this.targetValues[key] += value;
+    this.hasReached = false;
+  }
+
+  resetAll(value) {
+    for (const key in this.values) {
+      this.targetValues[key] = value;
+      this.values[key] = value;
+      this.deltaValues[key] = 0;
     }
 
-    setTarget(target) {
-        for (const key in target) {
-            this.targetValues[key] = target[key];
-        }
-        this.hasReached = false;
-    }
+    this.hasReached = true;
+  }
 
-    addToTarget(key, value) {
-        this.targetValues[key] += value;
-        this.hasReached = false;
+  resetData(values) {
+    for (const key in values) {
+      this.targetValues[key] = values[key];
+      this.values[key] = values[key];
+      this.deltaValues[key] = 0;
     }
+  }
 
-    resetAll(value) {
-        for (const key in this.values) {
-            this.targetValues[key] = value;
-            this.values[key] = value;
-            this.deltaValues[key] = 0;
-        }
+  getCurrentValues() {
+    return { ...this.values };
+  }
 
-        this.hasReached = true;
-    }
+  getDeltaValues() {
+    return { ...this.deltaValues };
+  }
 
-    resetData(values) {
-        for (const key in values) {
-            this.targetValues[key] = values[key];
-            this.values[key] = values[key];
-            this.deltaValues[key] = 0;
-        }
-    }
-
-    getCurrentValues() {
-        return { ...this.values };
-    }
-
-    getDeltaValues() {
-        return { ...this.deltaValues };
-    }
-
-    reachedTarget() {
-        return this.hasReached;
-    }
+  reachedTarget() {
+    return this.hasReached;
+  }
 }
